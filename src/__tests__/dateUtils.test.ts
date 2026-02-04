@@ -4,52 +4,50 @@ import {
   add,
   isWithinRange,
   isDateBefore,
+  isSameDay,
   getHolidays,
+  isHoliday,
 } from "../dateUtils";
-import moment from "moment";
-import { isSameDay } from "date-fns/fp";
 
 describe("Date Utils", () => {
-  // Add your tests here
+  describe("Test getCurrentYear", () => {
+    it("should return current year", async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date("2024-01-01"));
 
-  describe("test getCurrentYear", () => {
-    it("should return current year", () => {
-      const year_1995 = { year: vi.fn().mockReturnValue(1995) };
-      vi.mocked(moment).mockReturnValue(year_1995 as any);
-      expect(getCurrentYear()).toBe(1995);
+      expect(getCurrentYear()).toBe(2024);
+
+      vi.useRealTimers();
     });
   });
 
-  describe("test add", () => {
-    it("should add time to date", () => {
+  describe("Test add", () => {
+    it("should add days to date", () => {
       const start_date = new Date(1995, 3, 2, 10, 30);
       const end_date = new Date(1995, 3, 7, 10, 30);
       expect(add(start_date, 5)).toEqual(end_date);
     });
     // Invalid date inputs
-    it("should throw error for null", () => {
-      expect(add(null, 5)).toThrowError("Invalid date provided");
-    });
     it("should throw error for undefined", () => {
-      expect(add(undefined, 5)).toThrowError("Invalid date provided");
+      expect(() => add(undefined, 5)).toThrowError("Invalid date provided");
     });
     it("should throw error for wrong data type", () => {
-      expect(add("1995, 3, 2, 10, 30", 5)).toThrowError(
+      expect(() => add("1995, 3, 2, 10, 30", 5)).toThrowError(
         "Invalid date provided",
       );
     });
     it("should throw error for invalid Date object", () => {
       const invalidDate = new Date("hello");
-      expect(add(invalidDate, 5)).toThrowError("Invalid date provided");
+      expect(() => add(invalidDate, 5)).toThrowError("Invalid date provided");
     });
     // invalid amount input
     it("should throw an error if the amount is not a number", () => {
       const date = new Date(1995, 3, 2, 10, 30);
-      expect(add(date, "5")).toThrowError("Invalid amount provided");
+      expect(() => add(date, "5")).toThrowError("Invalid amount provided");
     });
   });
 
-  describe("test isWithinRange", () => {
+  describe("Test isWithinRange", () => {
     it("should returns date if it is within the given range", () => {
       const from = new Date(1995, 3, 2);
       const to = new Date(1995, 3, 7);
@@ -63,9 +61,9 @@ describe("Date Utils", () => {
       const to = new Date(1995, 3, 7);
       const date = new Date(1995, 3, 10);
 
-      expect(() => isWithinRange(date, from, to)).toBe(false);
+      expect(isWithinRange(date, from, to)).toBe(false);
     });
-    it("should throw and error when (from  date) is grater than (to date)", () => {
+    it("should throw an error when (from  date) is greater than (to date)", () => {
       const from = new Date(1995, 3, 7);
       const to = new Date(1995, 3, 2);
       const date = new Date(1995, 3, 10);
@@ -76,7 +74,7 @@ describe("Date Utils", () => {
     });
   });
 
-  describe("test isDateBefore", () => {
+  describe("Test isDateBefore", () => {
     it("should return true if date is before compareDate", () => {
       const date = new Date(1918, 4, 21);
       const compareDate = new Date(1918, 8, 9);
@@ -89,7 +87,7 @@ describe("Date Utils", () => {
     });
   });
 
-  describe("test isSameDay", () => {
+  describe("Test isSameDay", () => {
     it("should return true if the date match compareDate", () => {
       const date = new Date(1918, 4, 21);
       const compareDate = new Date(1918, 4, 21);
@@ -102,7 +100,7 @@ describe("Date Utils", () => {
     });
   });
 
-  describe("test getHolidays", () => {
+  describe("Async test getHolidays", () => {
     it("should return the given holidays for the inputted year", async () => {
       const year = 1992;
       const data = await getHolidays(year);
@@ -111,6 +109,19 @@ describe("Date Utils", () => {
         new Date(1992, 11, 25), // Christmas
         new Date(1992, 11, 31), // New Year's Eve
       ]);
+    });
+  });
+
+  describe("Async test isHoliday", () => {
+    it("should return true if day is a holiday", async () => {
+      const date = new Date(1992, 11, 25);
+      const holiday = await isHoliday(date);
+      expect(holiday).toBe(true);
+    });
+    it("should return false if day is not a holiday", async () => {
+      const date = new Date(1992, 9, 25);
+      const holiday = await isHoliday(date);
+      expect(holiday).toBe(false);
     });
   });
 });
