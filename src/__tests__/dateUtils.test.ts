@@ -29,10 +29,12 @@ describe("Date Utils", () => {
     });
     // Invalid date inputs
     it("should throw error for undefined", () => {
-      expect(() => add(undefined, 5)).toThrowError("Invalid date provided");
+      expect(() => add(undefined as any, 5)).toThrowError(
+        "Invalid date provided",
+      );
     });
     it("should throw error for wrong data type", () => {
-      expect(() => add("1995, 3, 2, 10, 30", 5)).toThrowError(
+      expect(() => add("1995, 3, 2, 10, 30" as any, 5)).toThrowError(
         "Invalid date provided",
       );
     });
@@ -43,7 +45,9 @@ describe("Date Utils", () => {
     // invalid amount input
     it("should throw an error if the amount is not a number", () => {
       const date = new Date(1995, 3, 2, 10, 30);
-      expect(() => add(date, "5")).toThrowError("Invalid amount provided");
+      expect(() => add(date, "5" as any)).toThrowError(
+        "Invalid amount provided",
+      );
     });
   });
 
